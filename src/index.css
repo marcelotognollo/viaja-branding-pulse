@@ -48,54 +48,54 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 210 100% 6%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 210 100% 6%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 210 100% 6%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 100% 6%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 215 25% 15%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 215 25% 15%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 215 25% 15%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 215 25% 15%;
+    --input: 215 25% 15%;
+    --ring: 200 100% 70%;
+    --sidebar-background: 210 100% 4%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 200 100% 60%;
+    --sidebar-primary-foreground: 210 100% 6%;
+    --sidebar-accent: 215 25% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 25% 12%;
+    --sidebar-ring: 200 100% 70%;
   }
 
   /* Light theme overrides for glassmorphism */
   .light {
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --glass-hover: rgba(255, 255, 255, 0.15);
+    --glass-bg: rgba(30, 64, 175, 0.1);
+    --glass-border: rgba(59, 130, 246, 0.2);
+    --glass-hover: rgba(30, 64, 175, 0.15);
   }
 
   .dark {
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --glass-hover: rgba(255, 255, 255, 0.15);
+    --glass-bg: rgba(30, 64, 175, 0.1);
+    --glass-border: rgba(59, 130, 246, 0.2);
+    --glass-hover: rgba(30, 64, 175, 0.15);
   }
 }
 
@@ -110,11 +110,11 @@
 
   /* Custom glassmorphism utilities */
   .glass {
-    @apply backdrop-blur-xl bg-white/10 border border-white/20;
+    @apply backdrop-blur-xl bg-blue-900/10 border border-blue-500/20;
   }
 
   .glass-hover {
-    @apply hover:bg-white/15 transition-all duration-300;
+    @apply hover:bg-blue-900/15 transition-all duration-300;
   }
 
   /* Custom scrollbar for dark theme */
@@ -127,11 +127,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-white/20 rounded-full;
+    @apply bg-blue-500/20 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-white/30;
+    @apply bg-blue-500/30;
   }
 
   /* Smooth transitions for theme switching */
@@ -142,15 +142,20 @@
 
 /* Light theme specific styles */
 .light body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0f172a 100%);
 }
 
 .light .glass {
-  @apply bg-white/20 border-white/30;
+  @apply bg-blue-100/20 border-blue-300/30;
 }
 
 .light .glass-hover {
-  @apply hover:bg-white/25;
+  @apply hover:bg-blue-100/25;
+}
+
+/* Dark theme specific styles */
+.dark body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%);
 }
 
 /* Animation keyframes for glassmorphism effects */
