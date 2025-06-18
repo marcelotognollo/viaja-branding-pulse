@@ -10,7 +10,6 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { 
   LayoutDashboard, 
@@ -24,7 +23,8 @@ import {
   Palette,
   Calendar,
   Settings,
-  LogOut
+  LogOut,
+  Star
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
@@ -88,23 +88,24 @@ const menuItems = [
 
 export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps) {
   return (
-    <Sidebar className="border-r border-blue-500/20 bg-slate-900/40 backdrop-blur-xl">
-      <SidebarHeader className="border-b border-blue-500/20 p-4">
+    <Sidebar className="border-r border-cyan-400/20 sirius-gradient backdrop-blur-xl">
+      <SidebarHeader className="border-b border-cyan-400/20 p-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
-            <MapPin className="w-4 h-4 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center relative">
+            <Star className="w-5 h-5 text-white icon-glow" fill="currentColor" />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-cyan-400/20 to-purple-500/20 blur-md"></div>
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">TravelPro</h2>
-            <p className="text-xs text-blue-300">Gestão de Viagens</p>
+            <h2 className="text-xl font-bold text-white glow">Sirius</h2>
+            <p className="text-xs text-cyan-300">Gestão de Viagens</p>
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-blue-300 text-xs uppercase tracking-wider">
-            Menu Principal
+          <SidebarGroupLabel className="text-cyan-300 text-xs uppercase tracking-wider font-medium">
+            Navegação
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -112,13 +113,13 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => setActiveSection(item.id)}
-                    className={`w-full justify-start gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    className={`w-full justify-start gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                       activeSection === item.id
-                        ? "bg-gradient-to-r from-blue-600/30 to-blue-800/30 border border-blue-500/40 text-white shadow-lg shadow-blue-500/20"
-                        : "text-blue-200 hover:bg-blue-900/20 hover:text-white"
+                        ? "bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-400/40 text-white shadow-lg shadow-cyan-500/20"
+                        : "text-slate-300 hover:bg-slate-800/30 hover:text-white hover:border hover:border-cyan-400/20"
                     }`}
                   >
-                    <item.icon className="w-4 h-4" />
+                    <item.icon className={`w-4 h-4 ${activeSection === item.id ? 'icon-glow' : ''}`} />
                     <span className="font-medium">{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -128,25 +129,25 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-blue-500/20 p-4">
-        <div className="flex items-center justify-between">
+      <SidebarFooter className="border-t border-cyan-400/20 p-4">
+        <div className="flex items-center justify-between mb-3">
           <ThemeToggle />
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded-lg hover:bg-blue-900/20 text-blue-300 hover:text-white transition-colors">
+            <button className="p-2 rounded-lg hover:bg-slate-800/30 text-slate-300 hover:text-white transition-colors">
               <Settings className="w-4 h-4" />
             </button>
-            <button className="p-2 rounded-lg hover:bg-blue-900/20 text-blue-300 hover:text-white transition-colors">
+            <button className="p-2 rounded-lg hover:bg-slate-800/30 text-slate-300 hover:text-white transition-colors">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
-        <div className="mt-2 flex items-center gap-3 p-2 rounded-lg bg-blue-900/20">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
+        <div className="flex items-center gap-3 p-3 rounded-xl sirius-card">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
             A
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate">Admin User</p>
-            <p className="text-xs text-blue-300">admin@travelpro.com</p>
+            <p className="text-xs text-cyan-300">admin@sirius.app</p>
           </div>
         </div>
       </SidebarFooter>

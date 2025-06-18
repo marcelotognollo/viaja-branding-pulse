@@ -1,11 +1,14 @@
 
 import { useState } from "react";
-import { ArrowLeft, Save, X } from "lucide-react";
+import { ArrowLeft, Save, Upload, Palette, Type, Sparkles, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 interface Brand {
   id?: string;
@@ -27,6 +30,11 @@ interface Brand {
     playlists: string[];
     references: string[];
   };
+  logos: {
+    primary: string;
+    horizontal: string;
+    favicon: string;
+  };
 }
 
 interface BrandFormProps {
@@ -42,8 +50,8 @@ export function BrandForm({ brand, onSave, onCancel }: BrandFormProps) {
     personality: brand?.personality || [],
     toneOfVoice: brand?.toneOfVoice || "",
     targetAudience: brand?.targetAudience || "",
-    primaryColors: brand?.primaryColors || ["#1e3a8a"],
-    secondaryColors: brand?.secondaryColors || ["#3b82f6"],
+    primaryColors: brand?.primaryColors || ["#0b1c3b"],
+    secondaryColors: brand?.secondaryColors || ["#66ccff"],
     typography: brand?.typography || {
       title: "",
       body: "",
@@ -54,240 +62,349 @@ export function BrandForm({ brand, onSave, onCancel }: BrandFormProps) {
       environments: [],
       playlists: [],
       references: []
+    },
+    logos: brand?.logos || {
+      primary: "",
+      horizontal: "",
+      favicon: ""
     }
   });
 
-  const [newPersonality, setNewPersonality] = useState("");
-  const [newScent, setNewScent] = useState("");
-  const [newEnvironment, setNewEnvironment] = useState("");
-  const [newPlaylist, setNewPlaylist] = useState("");
-  const [newReference, setNewReference] = useState("");
+  const [expandedSections, setExpandedSections] = useState({
+    branding: true,
+    visual: true,
+    atmosphere: true
+  });
 
   const handleSave = () => {
     onSave(formData);
   };
 
-  const addToArray = (field: keyof Brand, value: string, setterFn: (val: string) => void) => {
+  const addToArray = (path: string, value: string) => {
     if (value.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        [field]: [...(prev[field] as string[]), value.trim()]
-      }));
-      setterFn("");
+      if (path.includes('.')) {
+        const [parent, child] = path.split('.');
+        setFormData(prev => ({
+          ...prev,
+          [parent]: {
+            ...(prev[parent as keyof Brand] as any),
+            [child]: [...((prev[parent as keyof Brand] as any)[child] || []), value.trim()]
+          }
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [path]: [...(prev[path as keyof Brand] as string[]), value.trim()]
+        }));
+      }
     }
   };
 
-  const removeFromArray = (field: keyof Brand, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: (prev[field] as string[]).filter((_, i) => i !== index)
-    }));
-  };
-
-  const addToAtmosphere = (field: keyof Brand['atmosphere'], value: string, setterFn: (val: string) => void) => {
-    if (value.trim()) {
+  const removeFromArray = (path: string, index: number) => {
+    if (path.includes('.')) {
+      const [parent, child] = path.split('.');
       setFormData(prev => ({
         ...prev,
-        atmosphere: {
-          ...prev.atmosphere,
-          [field]: [...prev.atmosphere[field], value.trim()]
+        [parent]: {
+          ...(prev[parent as keyof Brand] as any),
+          [child]: ((prev[parent as keyof Brand] as any)[child] || []).filter((_: any, i: number) => i !== index)
         }
       }));
-      setterFn("");
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [path]: (prev[path as keyof Brand] as string[]).filter((_, i) => i !== index)
+      }));
     }
   };
 
-  const removeFromAtmosphere = (field: keyof Brand['atmosphere'], index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      atmosphere: {
-        ...prev.atmosphere,
-        [field]: prev.atmosphere[field].filter((_, i) => i !== index)
-      }
-    }));
+  const ArrayInput = ({ 
+    path, 
+    placeholder, 
+    items, 
+    colorClass = "bg-cyan-500/20 text-cyan-200" 
+  }: { 
+    path: string; 
+    placeholder: string; 
+    items: string[];
+    colorClass?: string;
+  }) => {
+    const [value, setValue] = useState("");
+
+    return (
+      <div className="space-y-3">
+        <div className="flex gap-2">
+          <Input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className="sirius-input"
+            placeholder={placeholder}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                addToArray(path, value);
+                setValue("");
+              }
+            }}
+          />
+          <Button 
+            onClick={() => {
+              addToArray(path, value);
+              setValue("");
+            }}
+            className="sirius-button px-4"
+          >
+            +
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {items.map((item, index) => (
+            <span
+              key={index}
+              className={`flex items-center gap-2 px-3 py-2 ${colorClass} rounded-lg text-sm font-medium`}
+            >
+              {item}
+              <button
+                onClick={() => removeFromArray(path, index)}
+                className="text-red-300 hover:text-red-200 ml-1"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 space-y-8 max-w-6xl mx-auto">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           <Button 
             variant="ghost" 
             onClick={onCancel}
-            className="text-blue-300 hover:text-white hover:bg-blue-600/20"
+            className="text-cyan-300 hover:text-white hover:bg-slate-800/30"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
-          <h1 className="text-3xl font-bold text-white">
-            {brand ? "Editar Marca" : "Nova Marca"}
-          </h1>
+          <div>
+            <h1 className="text-4xl font-bold text-white glow">
+              {brand ? "Editar Marca" : "Nova Marca"}
+            </h1>
+            <p className="text-cyan-300 mt-2">Configure todos os aspectos da identidade da marca</p>
+          </div>
         </div>
         <Button 
           onClick={handleSave}
-          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+          className="sirius-button px-8 py-3 text-lg"
         >
-          <Save className="w-4 h-4 mr-2" />
-          Salvar
+          <Save className="w-5 h-5 mr-2" />
+          Salvar Marca
         </Button>
       </div>
 
-      <Card className="glass border-blue-500/30">
-        <CardContent className="p-6">
-          <Tabs defaultValue="branding" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-blue-900/20">
-              <TabsTrigger value="branding" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-white">
-                Branding
-              </TabsTrigger>
-              <TabsTrigger value="visual" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-white">
-                Identidade Visual
-              </TabsTrigger>
-              <TabsTrigger value="atmosphere" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-white">
-                Atmosfera
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="branding" className="space-y-6 mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-blue-200">Nome da Marca</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="bg-blue-900/20 border-blue-500/30 text-white"
-                    placeholder="Ex: Viagens Premium"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="toneOfVoice" className="text-blue-200">Tom de Voz</Label>
-                  <Input
-                    id="toneOfVoice"
-                    value={formData.toneOfVoice}
-                    onChange={(e) => setFormData(prev => ({ ...prev, toneOfVoice: e.target.value }))}
-                    className="bg-blue-900/20 border-blue-500/30 text-white"
-                    placeholder="Ex: Informal e amigável"
-                  />
-                </div>
-              </div>
-
+      {/* Form Content */}
+      <div className="space-y-8">
+        {/* Basic Info */}
+        <Card className="sirius-card">
+          <CardHeader>
+            <CardTitle className="text-white text-xl flex items-center gap-3">
+              <Sparkles className="w-6 h-6 text-cyan-400 icon-glow" />
+              Informações Básicas
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-blue-200">Descrição Geral</Label>
+                <Label htmlFor="name" className="text-cyan-200 font-medium">Nome da Marca</Label>
                 <Input
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="bg-blue-900/20 border-blue-500/30 text-white"
-                  placeholder="Descreva o propósito e essência da marca"
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="sirius-input text-lg"
+                  placeholder="Ex: Viagens Premium"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="targetAudience" className="text-blue-200">Público-Alvo</Label>
+                <Label htmlFor="toneOfVoice" className="text-cyan-200 font-medium">Tom de Voz</Label>
                 <Input
-                  id="targetAudience"
-                  value={formData.targetAudience}
-                  onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value }))}
-                  className="bg-blue-900/20 border-blue-500/30 text-white"
-                  placeholder="Ex: Jovens de 25-35 anos, classe média alta"
+                  id="toneOfVoice"
+                  value={formData.toneOfVoice}
+                  onChange={(e) => setFormData(prev => ({ ...prev, toneOfVoice: e.target.value }))}
+                  className="sirius-input"
+                  placeholder="Ex: Informal e amigável"
                 />
               </div>
+            </div>
 
-              <div className="space-y-4">
-                <Label className="text-blue-200">Características da Personalidade</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={newPersonality}
-                    onChange={(e) => setNewPersonality(e.target.value)}
-                    className="bg-blue-900/20 border-blue-500/30 text-white"
-                    placeholder="Ex: Empática, ousada..."
-                    onKeyPress={(e) => e.key === 'Enter' && addToArray('personality', newPersonality, setNewPersonality)}
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-cyan-200 font-medium">Descrição da Marca</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                className="sirius-input min-h-[100px]"
+                placeholder="Descreva o propósito, essência e missão da marca..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-cyan-200 font-medium">Público-Alvo</Label>
+              <Textarea
+                value={formData.targetAudience}
+                onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value }))}
+                className="sirius-input"
+                placeholder="Ex: Jovens de 25-35 anos, classe média alta, interessados em experiências autênticas..."
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Branding Section */}
+        <Collapsible open={expandedSections.branding} onOpenChange={(open) => setExpandedSections(prev => ({ ...prev, branding: open }))}>
+          <CollapsibleTrigger asChild>
+            <Card className="sirius-card cursor-pointer hover:bg-slate-800/30 transition-colors">
+              <CardHeader>
+                <CardTitle className="text-white text-xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Palette className="w-6 h-6 text-purple-400 icon-glow" />
+                    Personalidade & Branding
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-cyan-400 transition-transform ${expandedSections.branding ? 'rotate-180' : ''}`} />
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <Card className="sirius-card mt-4">
+              <CardContent className="space-y-8 pt-6">
+                <div>
+                  <Label className="text-cyan-200 font-medium text-lg mb-4 block">Características da Personalidade</Label>
+                  <p className="text-slate-400 text-sm mb-4">Defina os traços que melhor representam a marca</p>
+                  <ArrayInput
+                    path="personality"
+                    placeholder="Ex: Empática, ousada, confiável..."
+                    items={formData.personality}
+                    colorClass="bg-purple-500/20 text-purple-200"
                   />
-                  <Button 
-                    onClick={() => addToArray('personality', newPersonality, setNewPersonality)}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    Adicionar
-                  </Button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {formData.personality.map((trait, index) => (
-                    <span
-                      key={index}
-                      className="flex items-center gap-2 px-3 py-1 bg-blue-600/20 text-blue-200 rounded-full text-sm"
-                    >
-                      {trait}
-                      <button
-                        onClick={() => removeFromArray('personality', index)}
-                        className="text-red-300 hover:text-red-200"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
 
-            <TabsContent value="visual" className="space-y-6 mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <Label className="text-blue-200">Cores Principais</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.primaryColors.map((color, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={color}
-                          onChange={(e) => {
-                            const newColors = [...formData.primaryColors];
-                            newColors[index] = e.target.value;
-                            setFormData(prev => ({ ...prev, primaryColors: newColors }));
-                          }}
-                          className="w-8 h-8 rounded border border-blue-500/30"
-                        />
-                        <span className="text-blue-200 text-sm">{color}</span>
-                        {formData.primaryColors.length > 1 && (
-                          <button
-                            onClick={() => {
-                              setFormData(prev => ({
-                                ...prev,
-                                primaryColors: prev.primaryColors.filter((_, i) => i !== index)
-                              }));
-                            }}
-                            className="text-red-300 hover:text-red-200"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    <Button
-                      onClick={() => setFormData(prev => ({ ...prev, primaryColors: [...prev.primaryColors, "#1e3a8a"] }))}
-                      className="bg-blue-600 hover:bg-blue-700 text-xs px-2 py-1"
-                    >
-                      + Cor
-                    </Button>
+        {/* Visual Identity Section */}
+        <Collapsible open={expandedSections.visual} onOpenChange={(open) => setExpandedSections(prev => ({ ...prev, visual: open }))}>
+          <CollapsibleTrigger asChild>
+            <Card className="sirius-card cursor-pointer hover:bg-slate-800/30 transition-colors">
+              <CardHeader>
+                <CardTitle className="text-white text-xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Eye className="w-6 h-6 text-cyan-400 icon-glow" />
+                    Identidade Visual
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-cyan-400 transition-transform ${expandedSections.visual ? 'rotate-180' : ''}`} />
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <Card className="sirius-card mt-4">
+              <CardContent className="space-y-8 pt-6">
+                {/* Logo Upload Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-4">
+                    <Label className="text-cyan-200 font-medium">Logo Principal</Label>
+                    <div className="border-2 border-dashed border-cyan-400/30 rounded-xl p-6 text-center hover:border-cyan-400/50 transition-colors">
+                      <Upload className="w-8 h-8 text-cyan-400 mx-auto mb-3" />
+                      <p className="text-sm text-slate-400">PNG ou SVG</p>
+                      <p className="text-xs text-slate-500">Recomendado: quadrado</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <Label className="text-cyan-200 font-medium">Logo Horizontal</Label>
+                    <div className="border-2 border-dashed border-cyan-400/30 rounded-xl p-6 text-center hover:border-cyan-400/50 transition-colors">
+                      <Upload className="w-8 h-8 text-cyan-400 mx-auto mb-3" />
+                      <p className="text-sm text-slate-400">PNG ou SVG</p>
+                      <p className="text-xs text-slate-500">Recomendado: retângulo</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <Label className="text-cyan-200 font-medium">Favicon</Label>
+                    <div className="border-2 border-dashed border-cyan-400/30 rounded-xl p-6 text-center hover:border-cyan-400/50 transition-colors">
+                      <Upload className="w-8 h-8 text-cyan-400 mx-auto mb-3" />
+                      <p className="text-sm text-slate-400">PNG ou ICO</p>
+                      <p className="text-xs text-slate-500">32x32 ou 64x64px</p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <Label className="text-blue-200">Cores Secundárias</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.secondaryColors.map((color, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={color}
-                          onChange={(e) => {
-                            const newColors = [...formData.secondaryColors];
-                            newColors[index] = e.target.value;
-                            setFormData(prev => ({ ...prev, secondaryColors: newColors }));
-                          }}
-                          className="w-8 h-8 rounded border border-blue-500/30"
-                        />
-                        <span className="text-blue-200 text-sm">{color}</span>
-                        {formData.secondaryColors.length > 1 && (
+                {/* Colors Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <Label className="text-cyan-200 font-medium text-lg">Cores Principais</Label>
+                    <div className="flex flex-wrap gap-3">
+                      {formData.primaryColors.map((color, index) => (
+                        <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50">
+                          <input
+                            type="color"
+                            value={color}
+                            onChange={(e) => {
+                              const newColors = [...formData.primaryColors];
+                              newColors[index] = e.target.value;
+                              setFormData(prev => ({ ...prev, primaryColors: newColors }));
+                            }}
+                            className="w-12 h-12 rounded-lg border-2 border-cyan-400/30 cursor-pointer"
+                          />
+                          <div>
+                            <span className="text-white font-medium block">{color.toUpperCase()}</span>
+                            <span className="text-slate-400 text-xs">Principal {index + 1}</span>
+                          </div>
+                          {formData.primaryColors.length > 1 && (
+                            <button
+                              onClick={() => {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  primaryColors: prev.primaryColors.filter((_, i) => i !== index)
+                                }));
+                              }}
+                              className="text-red-300 hover:text-red-200 ml-2"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <Button
+                        onClick={() => setFormData(prev => ({ ...prev, primaryColors: [...prev.primaryColors, "#0b1c3b"] }))}
+                        className="h-12 w-12 rounded-lg border-2 border-dashed border-cyan-400/30 bg-transparent hover:border-cyan-400/50 hover:bg-cyan-400/5"
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-cyan-200 font-medium text-lg">Cores Secundárias</Label>
+                    <div className="flex flex-wrap gap-3">
+                      {formData.secondaryColors.map((color, index) => (
+                        <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50">
+                          <input
+                            type="color"
+                            value={color}
+                            onChange={(e) => {
+                              const newColors = [...formData.secondaryColors];
+                              newColors[index] = e.target.value;
+                              setFormData(prev => ({ ...prev, secondaryColors: newColors }));
+                            }}
+                            className="w-12 h-12 rounded-lg border-2 border-cyan-400/30 cursor-pointer"
+                          />
+                          <div>
+                            <span className="text-white font-medium block">{color.toUpperCase()}</span>
+                            <span className="text-slate-400 text-xs">Secundária {index + 1}</span>
+                          </div>
                           <button
                             onClick={() => {
                               setFormData(prev => ({
@@ -295,214 +412,143 @@ export function BrandForm({ brand, onSave, onCancel }: BrandFormProps) {
                                 secondaryColors: prev.secondaryColors.filter((_, i) => i !== index)
                               }));
                             }}
-                            className="text-red-300 hover:text-red-200"
+                            className="text-red-300 hover:text-red-200 ml-2"
                           >
-                            <X className="w-3 h-3" />
+                            ×
                           </button>
-                        )}
-                      </div>
-                    ))}
-                    <Button
-                      onClick={() => setFormData(prev => ({ ...prev, secondaryColors: [...prev.secondaryColors, "#3b82f6"] }))}
-                      className="bg-blue-600 hover:bg-blue-700 text-xs px-2 py-1"
-                    >
-                      + Cor
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="titleFont" className="text-blue-200">Fonte Título</Label>
-                  <Input
-                    id="titleFont"
-                    value={formData.typography.title}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      typography: { ...prev.typography, title: e.target.value }
-                    }))}
-                    className="bg-blue-900/20 border-blue-500/30 text-white"
-                    placeholder="Ex: Montserrat"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="bodyFont" className="text-blue-200">Fonte Corpo</Label>
-                  <Input
-                    id="bodyFont"
-                    value={formData.typography.body}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      typography: { ...prev.typography, body: e.target.value }
-                    }))}
-                    className="bg-blue-900/20 border-blue-500/30 text-white"
-                    placeholder="Ex: Inter"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="accentFont" className="text-blue-200">Fonte Destaque</Label>
-                  <Input
-                    id="accentFont"
-                    value={formData.typography.accent}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      typography: { ...prev.typography, accent: e.target.value }
-                    }))}
-                    className="bg-blue-900/20 border-blue-500/30 text-white"
-                    placeholder="Ex: Poppins"
-                  />
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="atmosphere" className="space-y-6 mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <Label className="text-blue-200">Aromas e Sensações</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={newScent}
-                      onChange={(e) => setNewScent(e.target.value)}
-                      className="bg-blue-900/20 border-blue-500/30 text-white"
-                      placeholder="Ex: Lavanda, Vanilla..."
-                      onKeyPress={(e) => e.key === 'Enter' && addToAtmosphere('scents', newScent, setNewScent)}
-                    />
-                    <Button 
-                      onClick={() => addToAtmosphere('scents', newScent, setNewScent)}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.atmosphere.scents.map((scent, index) => (
-                      <span
-                        key={index}
-                        className="flex items-center gap-2 px-3 py-1 bg-blue-600/20 text-blue-200 rounded-full text-sm"
+                        </div>
+                      ))}
+                      <Button
+                        onClick={() => setFormData(prev => ({ ...prev, secondaryColors: [...prev.secondaryColors, "#66ccff"] }))}
+                        className="h-12 w-12 rounded-lg border-2 border-dashed border-cyan-400/30 bg-transparent hover:border-cyan-400/50 hover:bg-cyan-400/5"
                       >
-                        {scent}
-                        <button
-                          onClick={() => removeFromAtmosphere('scents', index)}
-                          className="text-red-300 hover:text-red-200"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
+                        +
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
+                {/* Typography Section */}
                 <div className="space-y-4">
-                  <Label className="text-blue-200">Ambientes</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={newEnvironment}
-                      onChange={(e) => setNewEnvironment(e.target.value)}
-                      className="bg-blue-900/20 border-blue-500/30 text-white"
-                      placeholder="Ex: Praia, Montanha..."
-                      onKeyPress={(e) => e.key === 'Enter' && addToAtmosphere('environments', newEnvironment, setNewEnvironment)}
-                    />
-                    <Button 
-                      onClick={() => addToAtmosphere('environments', newEnvironment, setNewEnvironment)}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.atmosphere.environments.map((env, index) => (
-                      <span
-                        key={index}
-                        className="flex items-center gap-2 px-3 py-1 bg-blue-600/20 text-blue-200 rounded-full text-sm"
-                      >
-                        {env}
-                        <button
-                          onClick={() => removeFromAtmosphere('environments', index)}
-                          className="text-red-300 hover:text-red-200"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
+                  <Label className="text-cyan-200 font-medium text-lg flex items-center gap-2">
+                    <Type className="w-5 h-5" />
+                    Tipografia
+                  </Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="titleFont" className="text-slate-300">Fonte para Títulos</Label>
+                      <Input
+                        id="titleFont"
+                        value={formData.typography.title}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          typography: { ...prev.typography, title: e.target.value }
+                        }))}
+                        className="sirius-input"
+                        placeholder="Ex: Montserrat"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bodyFont" className="text-slate-300">Fonte para Corpo</Label>
+                      <Input
+                        id="bodyFont"
+                        value={formData.typography.body}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          typography: { ...prev.typography, body: e.target.value }
+                        }))}
+                        className="sirius-input"
+                        placeholder="Ex: Inter"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="accentFont" className="text-slate-300">Fonte para Destaque</Label>
+                      <Input
+                        id="accentFont"
+                        value={formData.typography.accent}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          typography: { ...prev.typography, accent: e.target.value }
+                        }))}
+                        className="sirius-input"
+                        placeholder="Ex: Poppins"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <Label className="text-blue-200">Playlists/Trilhas</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={newPlaylist}
-                      onChange={(e) => setNewPlaylist(e.target.value)}
-                      className="bg-blue-900/20 border-blue-500/30 text-white"
-                      placeholder="Ex: Jazz Lounge, Rock..."
-                      onKeyPress={(e) => e.key === 'Enter' && addToAtmosphere('playlists', newPlaylist, setNewPlaylist)}
+        {/* Atmosphere Section */}
+        <Collapsible open={expandedSections.atmosphere} onOpenChange={(open) => setExpandedSections(prev => ({ ...prev, atmosphere: open }))}>
+          <CollapsibleTrigger asChild>
+            <Card className="sirius-card cursor-pointer hover:bg-slate-800/30 transition-colors">
+              <CardHeader>
+                <CardTitle className="text-white text-xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-6 h-6 text-purple-400 icon-glow" />
+                    Atmosfera & Inspiração
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-cyan-400 transition-transform ${expandedSections.atmosphere ? 'rotate-180' : ''}`} />
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <Card className="sirius-card mt-4">
+              <CardContent className="space-y-8 pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <Label className="text-cyan-200 font-medium text-lg mb-4 block">Aromas e Sensações</Label>
+                    <p className="text-slate-400 text-sm mb-4">Que sensações olfativas e táteis a marca evoca?</p>
+                    <ArrayInput
+                      path="atmosphere.scents"
+                      placeholder="Ex: Lavanda, Vanilla, Oceano..."
+                      items={formData.atmosphere.scents}
+                      colorClass="bg-green-500/20 text-green-200"
                     />
-                    <Button 
-                      onClick={() => addToAtmosphere('playlists', newPlaylist, setNewPlaylist)}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      +
-                    </Button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.atmosphere.playlists.map((playlist, index) => (
-                      <span
-                        key={index}
-                        className="flex items-center gap-2 px-3 py-1 bg-blue-600/20 text-blue-200 rounded-full text-sm"
-                      >
-                        {playlist}
-                        <button
-                          onClick={() => removeFromAtmosphere('playlists', index)}
-                          className="text-red-300 hover:text-red-200"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
 
-                <div className="space-y-4">
-                  <Label className="text-blue-200">Referências Visuais</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={newReference}
-                      onChange={(e) => setNewReference(e.target.value)}
-                      className="bg-blue-900/20 border-blue-500/30 text-white"
-                      placeholder="Ex: Apple, Nike..."
-                      onKeyPress={(e) => e.key === 'Enter' && addToAtmosphere('references', newReference, setNewReference)}
+                  <div>
+                    <Label className="text-cyan-200 font-medium text-lg mb-4 block">Ambientes</Label>
+                    <p className="text-slate-400 text-sm mb-4">Onde a marca se sentiria em casa?</p>
+                    <ArrayInput
+                      path="atmosphere.environments"
+                      placeholder="Ex: Praia, Montanha, Cidade..."
+                      items={formData.atmosphere.environments}
+                      colorClass="bg-orange-500/20 text-orange-200"
                     />
-                    <Button 
-                      onClick={() => addToAtmosphere('references', newReference, setNewReference)}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      +
-                    </Button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.atmosphere.references.map((ref, index) => (
-                      <span
-                        key={index}
-                        className="flex items-center gap-2 px-3 py-1 bg-blue-600/20 text-blue-200 rounded-full text-sm"
-                      >
-                        {ref}
-                        <button
-                          onClick={() => removeFromAtmosphere('references', index)}
-                          className="text-red-300 hover:text-red-200"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
+
+                  <div>
+                    <Label className="text-cyan-200 font-medium text-lg mb-4 block">Trilhas Musicais</Label>
+                    <p className="text-slate-400 text-sm mb-4">Que estilos musicais combinam com a marca?</p>
+                    <ArrayInput
+                      path="atmosphere.playlists"
+                      placeholder="Ex: Jazz Lounge, Rock Indie..."
+                      items={formData.atmosphere.playlists}
+                      colorClass="bg-pink-500/20 text-pink-200"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-cyan-200 font-medium text-lg mb-4 block">Referências Visuais</Label>
+                    <p className="text-slate-400 text-sm mb-4">Que marcas ou estilos servem de inspiração?</p>
+                    <ArrayInput
+                      path="atmosphere.references"
+                      placeholder="Ex: Apple, Airbnb, Patagonia..."
+                      items={formData.atmosphere.references}
+                      colorClass="bg-cyan-500/20 text-cyan-200"
+                    />
                   </div>
                 </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
     </div>
   );
 }

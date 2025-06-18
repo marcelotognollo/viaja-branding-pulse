@@ -1,5 +1,5 @@
 
-import { ArrowLeft, Edit, Download } from "lucide-react";
+import { ArrowLeft, Edit, Download, Star, Palette, Type, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,6 +25,11 @@ interface Brand {
     playlists: string[];
     references: string[];
   };
+  logos?: {
+    primary: string;
+    horizontal: string;
+    favicon: string;
+  };
 }
 
 interface BrandViewProps {
@@ -35,33 +40,36 @@ interface BrandViewProps {
 
 export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 space-y-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           <Button 
             variant="ghost" 
             onClick={onBack}
-            className="text-blue-300 hover:text-white hover:bg-blue-600/20"
+            className="text-cyan-300 hover:text-white hover:bg-slate-800/30"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-white">{brand.name}</h1>
-            <p className="text-blue-200">{brand.description}</p>
+            <h1 className="text-4xl font-bold text-white flex items-center gap-4 glow">
+              <Star className="w-8 h-8 text-cyan-400 icon-glow" fill="currentColor" />
+              {brand.name}
+            </h1>
+            <p className="text-cyan-300 mt-2 text-lg">{brand.description}</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           <Button 
             onClick={onEdit}
             variant="outline"
-            className="border-blue-500/30 text-blue-300 hover:bg-blue-600/20 hover:text-white"
+            className="border-cyan-400/40 text-cyan-300 hover:bg-cyan-500/20 hover:text-white px-6 py-3"
           >
             <Edit className="w-4 h-4 mr-2" />
             Editar
           </Button>
           <Button 
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+            className="sirius-button px-6 py-3"
           >
             <Download className="w-4 h-4 mr-2" />
             Exportar
@@ -70,30 +78,45 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
       </div>
 
       <Tabs defaultValue="branding" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-blue-900/20">
-          <TabsTrigger value="branding" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-white">
+        <TabsList className="grid w-full grid-cols-3 sirius-card mb-8">
+          <TabsTrigger 
+            value="branding" 
+            className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white"
+          >
+            <Palette className="w-4 h-4 mr-2" />
             Branding
           </TabsTrigger>
-          <TabsTrigger value="visual" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-white">
+          <TabsTrigger 
+            value="visual" 
+            className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white"
+          >
+            <Type className="w-4 h-4 mr-2" />
             Identidade Visual
           </TabsTrigger>
-          <TabsTrigger value="atmosphere" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-white">
+          <TabsTrigger 
+            value="atmosphere" 
+            className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
             Atmosfera
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="branding" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="glass border-blue-500/30">
+            <Card className="sirius-card">
               <CardHeader>
-                <CardTitle className="text-white">Personalidade</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Star className="w-5 h-5 text-purple-400" />
+                  Personalidade
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {brand.personality.map((trait, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-blue-600/20 text-blue-200 rounded-full text-sm"
+                      className="px-4 py-2 bg-purple-500/20 text-purple-200 rounded-lg text-sm font-medium"
                     >
                       {trait}
                     </span>
@@ -102,21 +125,27 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
               </CardContent>
             </Card>
 
-            <Card className="glass border-blue-500/30">
+            <Card className="sirius-card">
               <CardHeader>
-                <CardTitle className="text-white">Tom de Voz</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-cyan-400" />
+                  Tom de Voz
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-blue-200">{brand.toneOfVoice}</p>
+                <p className="text-slate-300 leading-relaxed">{brand.toneOfVoice}</p>
               </CardContent>
             </Card>
 
-            <Card className="glass border-blue-500/30 md:col-span-2">
+            <Card className="sirius-card md:col-span-2">
               <CardHeader>
-                <CardTitle className="text-white">Público-Alvo</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Star className="w-5 h-5 text-cyan-400" />
+                  Público-Alvo
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-blue-200">{brand.targetAudience}</p>
+                <p className="text-slate-300 leading-relaxed">{brand.targetAudience}</p>
               </CardContent>
             </Card>
           </div>
@@ -124,35 +153,38 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
 
         <TabsContent value="visual" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="glass border-blue-500/30">
+            <Card className="sirius-card">
               <CardHeader>
-                <CardTitle className="text-white">Paleta de Cores</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Palette className="w-5 h-5 text-cyan-400" />
+                  Paleta de Cores
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div>
-                  <h4 className="text-blue-200 font-medium mb-2">Cores Principais</h4>
-                  <div className="flex gap-2">
+                  <h4 className="text-cyan-200 font-medium mb-4 text-lg">Cores Principais</h4>
+                  <div className="flex gap-4">
                     {brand.primaryColors.map((color, index) => (
                       <div key={index} className="text-center">
                         <div
-                          className="w-12 h-12 rounded-lg border border-white/20 mb-1"
+                          className="w-16 h-16 rounded-xl border-2 border-white/20 mb-2 shadow-lg"
                           style={{ backgroundColor: color }}
                         />
-                        <span className="text-xs text-blue-300">{color}</span>
+                        <span className="text-xs text-cyan-300 font-mono">{color.toUpperCase()}</span>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-blue-200 font-medium mb-2">Cores Secundárias</h4>
-                  <div className="flex gap-2">
+                  <h4 className="text-cyan-200 font-medium mb-4 text-lg">Cores Secundárias</h4>
+                  <div className="flex gap-4">
                     {brand.secondaryColors.map((color, index) => (
                       <div key={index} className="text-center">
                         <div
-                          className="w-12 h-12 rounded-lg border border-white/20 mb-1"
+                          className="w-16 h-16 rounded-xl border-2 border-white/20 mb-2 shadow-lg"
                           style={{ backgroundColor: color }}
                         />
-                        <span className="text-xs text-blue-300">{color}</span>
+                        <span className="text-xs text-cyan-300 font-mono">{color.toUpperCase()}</span>
                       </div>
                     ))}
                   </div>
@@ -160,22 +192,31 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
               </CardContent>
             </Card>
 
-            <Card className="glass border-blue-500/30">
+            <Card className="sirius-card">
               <CardHeader>
-                <CardTitle className="text-white">Tipografia</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Type className="w-5 h-5 text-purple-400" />
+                  Tipografia
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <span className="text-blue-300 text-sm">Título:</span>
-                  <p className="text-white font-medium">{brand.typography.title || "Não definido"}</p>
+              <CardContent className="space-y-4">
+                <div className="p-4 rounded-lg bg-slate-800/50">
+                  <span className="text-cyan-300 text-sm font-medium">Título:</span>
+                  <p className="text-white font-bold text-lg mt-1">
+                    {brand.typography.title || "Não definido"}
+                  </p>
                 </div>
-                <div>
-                  <span className="text-blue-300 text-sm">Corpo:</span>
-                  <p className="text-white">{brand.typography.body || "Não definido"}</p>
+                <div className="p-4 rounded-lg bg-slate-800/50">
+                  <span className="text-cyan-300 text-sm font-medium">Corpo:</span>
+                  <p className="text-white mt-1">
+                    {brand.typography.body || "Não definido"}
+                  </p>
                 </div>
-                <div>
-                  <span className="text-blue-300 text-sm">Destaque:</span>
-                  <p className="text-white font-bold">{brand.typography.accent || "Não definido"}</p>
+                <div className="p-4 rounded-lg bg-slate-800/50">
+                  <span className="text-cyan-300 text-sm font-medium">Destaque:</span>
+                  <p className="text-white font-semibold mt-1">
+                    {brand.typography.accent || "Não definido"}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -184,85 +225,97 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
 
         <TabsContent value="atmosphere" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="glass border-blue-500/30">
+            <Card className="sirius-card">
               <CardHeader>
-                <CardTitle className="text-white">Aromas e Sensações</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-green-400" />
+                  Aromas e Sensações
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {brand.atmosphere.scents.map((scent, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-green-600/20 text-green-200 rounded-full text-sm"
+                      className="px-3 py-2 bg-green-500/20 text-green-200 rounded-lg text-sm font-medium"
                     >
                       {scent}
                     </span>
                   ))}
                   {brand.atmosphere.scents.length === 0 && (
-                    <span className="text-blue-300 text-sm">Nenhum aroma definido</span>
+                    <span className="text-slate-400 text-sm italic">Nenhum aroma definido</span>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="glass border-blue-500/30">
+            <Card className="sirius-card">
               <CardHeader>
-                <CardTitle className="text-white">Ambientes</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Star className="w-5 h-5 text-orange-400" />
+                  Ambientes
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {brand.atmosphere.environments.map((env, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-purple-600/20 text-purple-200 rounded-full text-sm"
+                      className="px-3 py-2 bg-orange-500/20 text-orange-200 rounded-lg text-sm font-medium"
                     >
                       {env}
                     </span>
                   ))}
                   {brand.atmosphere.environments.length === 0 && (
-                    <span className="text-blue-300 text-sm">Nenhum ambiente definido</span>
+                    <span className="text-slate-400 text-sm italic">Nenhum ambiente definido</span>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="glass border-blue-500/30">
+            <Card className="sirius-card">
               <CardHeader>
-                <CardTitle className="text-white">Trilhas Musicais</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-pink-400" />
+                  Trilhas Musicais
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {brand.atmosphere.playlists.map((playlist, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-orange-600/20 text-orange-200 rounded-full text-sm"
+                      className="px-3 py-2 bg-pink-500/20 text-pink-200 rounded-lg text-sm font-medium"
                     >
                       {playlist}
                     </span>
                   ))}
                   {brand.atmosphere.playlists.length === 0 && (
-                    <span className="text-blue-300 text-sm">Nenhuma trilha definida</span>
+                    <span className="text-slate-400 text-sm italic">Nenhuma trilha definida</span>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="glass border-blue-500/30">
+            <Card className="sirius-card">
               <CardHeader>
-                <CardTitle className="text-white">Referências Visuais</CardTitle>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Star className="w-5 h-5 text-cyan-400" />
+                  Referências Visuais
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {brand.atmosphere.references.map((ref, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-cyan-600/20 text-cyan-200 rounded-full text-sm"
+                      className="px-3 py-2 bg-cyan-500/20 text-cyan-200 rounded-lg text-sm font-medium"
                     >
                       {ref}
                     </span>
                   ))}
                   {brand.atmosphere.references.length === 0 && (
-                    <span className="text-blue-300 text-sm">Nenhuma referência definida</span>
+                    <span className="text-slate-400 text-sm italic">Nenhuma referência definida</span>
                   )}
                 </div>
               </CardContent>
