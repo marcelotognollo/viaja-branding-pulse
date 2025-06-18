@@ -42,7 +42,7 @@ export function ImageUpload({
     setIsUploading(true);
 
     // Create image to validate dimensions
-    const img = new Image();
+    const img = document.createElement('img');
     const reader = new FileReader();
 
     reader.onload = (e) => {
