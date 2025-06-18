@@ -1,9 +1,7 @@
-
 import { ArrowLeft, Edit, Download, Star, Palette, Type, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 interface Brand {
   id: string;
   name: string;
@@ -31,23 +29,20 @@ interface Brand {
     favicon: string;
   };
 }
-
 interface BrandViewProps {
   brand: Brand;
   onBack: () => void;
   onEdit: () => void;
 }
-
-export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
-  return (
-    <div className="p-8 space-y-8 max-w-6xl mx-auto">
+export function BrandView({
+  brand,
+  onBack,
+  onEdit
+}: BrandViewProps) {
+  return <div className="p-8 space-y-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Button 
-            variant="ghost" 
-            onClick={onBack}
-            className="text-cyan-300 hover:text-white hover:bg-slate-800/30"
-          >
+          <Button variant="ghost" onClick={onBack} className="text-cyan-300 hover:text-white hover:bg-slate-800/30">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
@@ -60,17 +55,11 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
           </div>
         </div>
         <div className="flex gap-4">
-          <Button 
-            onClick={onEdit}
-            variant="outline"
-            className="border-cyan-400/40 text-cyan-300 hover:bg-cyan-500/20 hover:text-white px-6 py-3"
-          >
+          <Button onClick={onEdit} variant="outline" className="border-cyan-400/40 text-cyan-300 hover:bg-cyan-500/20 hover:text-white px-6 py-3">
             <Edit className="w-4 h-4 mr-2" />
             Editar
           </Button>
-          <Button 
-            className="sirius-button px-6 py-3"
-          >
+          <Button className="sirius-button px-6 py-3">
             <Download className="w-4 h-4 mr-2" />
             Exportar
           </Button>
@@ -78,25 +67,16 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
       </div>
 
       <Tabs defaultValue="branding" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 sirius-card mb-8">
-          <TabsTrigger 
-            value="branding" 
-            className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white"
-          >
+        <TabsList className="grid w-full grid-cols-3 sirius-card mb-8 py-0">
+          <TabsTrigger value="branding" className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white py-[6px]">
             <Palette className="w-4 h-4 mr-2" />
             Branding
           </TabsTrigger>
-          <TabsTrigger 
-            value="visual" 
-            className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white"
-          >
+          <TabsTrigger value="visual" className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white">
             <Type className="w-4 h-4 mr-2" />
             Identidade Visual
           </TabsTrigger>
-          <TabsTrigger 
-            value="atmosphere" 
-            className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white"
-          >
+          <TabsTrigger value="atmosphere" className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white">
             <Sparkles className="w-4 h-4 mr-2" />
             Atmosfera
           </TabsTrigger>
@@ -113,14 +93,9 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-3">
-                  {brand.personality.map((trait, index) => (
-                    <span
-                      key={index}
-                      className="px-4 py-2 bg-purple-500/20 text-purple-200 rounded-lg text-sm font-medium"
-                    >
+                  {brand.personality.map((trait, index) => <span key={index} className="px-4 py-2 bg-purple-500/20 text-purple-200 rounded-lg text-sm font-medium">
                       {trait}
-                    </span>
-                  ))}
+                    </span>)}
                 </div>
               </CardContent>
             </Card>
@@ -164,29 +139,23 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
                 <div>
                   <h4 className="text-cyan-200 font-medium mb-4 text-lg">Cores Principais</h4>
                   <div className="flex gap-4">
-                    {brand.primaryColors.map((color, index) => (
-                      <div key={index} className="text-center">
-                        <div
-                          className="w-16 h-16 rounded-xl border-2 border-white/20 mb-2 shadow-lg"
-                          style={{ backgroundColor: color }}
-                        />
+                    {brand.primaryColors.map((color, index) => <div key={index} className="text-center">
+                        <div className="w-16 h-16 rounded-xl border-2 border-white/20 mb-2 shadow-lg" style={{
+                      backgroundColor: color
+                    }} />
                         <span className="text-xs text-cyan-300 font-mono">{color.toUpperCase()}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
                 <div>
                   <h4 className="text-cyan-200 font-medium mb-4 text-lg">Cores Secundárias</h4>
                   <div className="flex gap-4">
-                    {brand.secondaryColors.map((color, index) => (
-                      <div key={index} className="text-center">
-                        <div
-                          className="w-16 h-16 rounded-xl border-2 border-white/20 mb-2 shadow-lg"
-                          style={{ backgroundColor: color }}
-                        />
+                    {brand.secondaryColors.map((color, index) => <div key={index} className="text-center">
+                        <div className="w-16 h-16 rounded-xl border-2 border-white/20 mb-2 shadow-lg" style={{
+                      backgroundColor: color
+                    }} />
                         <span className="text-xs text-cyan-300 font-mono">{color.toUpperCase()}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </CardContent>
@@ -234,17 +203,10 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {brand.atmosphere.scents.map((scent, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-2 bg-green-500/20 text-green-200 rounded-lg text-sm font-medium"
-                    >
+                  {brand.atmosphere.scents.map((scent, index) => <span key={index} className="px-3 py-2 bg-green-500/20 text-green-200 rounded-lg text-sm font-medium">
                       {scent}
-                    </span>
-                  ))}
-                  {brand.atmosphere.scents.length === 0 && (
-                    <span className="text-slate-400 text-sm italic">Nenhum aroma definido</span>
-                  )}
+                    </span>)}
+                  {brand.atmosphere.scents.length === 0 && <span className="text-slate-400 text-sm italic">Nenhum aroma definido</span>}
                 </div>
               </CardContent>
             </Card>
@@ -258,17 +220,10 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {brand.atmosphere.environments.map((env, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-2 bg-orange-500/20 text-orange-200 rounded-lg text-sm font-medium"
-                    >
+                  {brand.atmosphere.environments.map((env, index) => <span key={index} className="px-3 py-2 bg-orange-500/20 text-orange-200 rounded-lg text-sm font-medium">
                       {env}
-                    </span>
-                  ))}
-                  {brand.atmosphere.environments.length === 0 && (
-                    <span className="text-slate-400 text-sm italic">Nenhum ambiente definido</span>
-                  )}
+                    </span>)}
+                  {brand.atmosphere.environments.length === 0 && <span className="text-slate-400 text-sm italic">Nenhum ambiente definido</span>}
                 </div>
               </CardContent>
             </Card>
@@ -282,17 +237,10 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {brand.atmosphere.playlists.map((playlist, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-2 bg-pink-500/20 text-pink-200 rounded-lg text-sm font-medium"
-                    >
+                  {brand.atmosphere.playlists.map((playlist, index) => <span key={index} className="px-3 py-2 bg-pink-500/20 text-pink-200 rounded-lg text-sm font-medium">
                       {playlist}
-                    </span>
-                  ))}
-                  {brand.atmosphere.playlists.length === 0 && (
-                    <span className="text-slate-400 text-sm italic">Nenhuma trilha definida</span>
-                  )}
+                    </span>)}
+                  {brand.atmosphere.playlists.length === 0 && <span className="text-slate-400 text-sm italic">Nenhuma trilha definida</span>}
                 </div>
               </CardContent>
             </Card>
@@ -306,23 +254,15 @@ export function BrandView({ brand, onBack, onEdit }: BrandViewProps) {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {brand.atmosphere.references.map((ref, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-2 bg-cyan-500/20 text-cyan-200 rounded-lg text-sm font-medium"
-                    >
+                  {brand.atmosphere.references.map((ref, index) => <span key={index} className="px-3 py-2 bg-cyan-500/20 text-cyan-200 rounded-lg text-sm font-medium">
                       {ref}
-                    </span>
-                  ))}
-                  {brand.atmosphere.references.length === 0 && (
-                    <span className="text-slate-400 text-sm italic">Nenhuma referência definida</span>
-                  )}
+                    </span>)}
+                  {brand.atmosphere.references.length === 0 && <span className="text-slate-400 text-sm italic">Nenhuma referência definida</span>}
                 </div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 }
