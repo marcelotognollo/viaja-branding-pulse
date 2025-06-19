@@ -33,7 +33,7 @@ export function useBrands() {
         return;
       }
 
-      // Transform database data to Brand type
+      // Transform database data to Brand type with proper type casting
       const transformedBrands: Brand[] = (data || []).map(brand => ({
         id: brand.id,
         name: brand.name || '',
@@ -44,19 +44,19 @@ export function useBrands() {
         targetAudience: brand.target_audience || '',
         primaryColors: brand.primary_colors || ['#0b1c3b'],
         secondaryColors: brand.secondary_colors || ['#66ccff'],
-        typography: brand.typography || { title: '', body: '', accent: '' },
-        atmosphere: brand.atmosphere || { scents: [], environments: [], playlists: [], references: [] },
-        logos: brand.logos || { primary: '', horizontal: '', favicon: '' },
+        typography: (brand.typography as { title: string; body: string; accent: string }) || { title: '', body: '', accent: '' },
+        atmosphere: (brand.atmosphere as { scents: string[]; environments: string[]; playlists: string[]; references: string[] }) || { scents: [], environments: [], playlists: [], references: [] },
+        logos: (brand.logos as { primary: string; horizontal: string; favicon: string }) || { primary: '', horizontal: '', favicon: '' },
         brandImage: brand.brand_image,
         brandStory: brand.brand_story,
-        timeline: brand.timeline || [],
+        timeline: (brand.timeline as Array<{ year: string; event: string }>) || [],
         publicObjections: brand.public_objections || [],
-        desires: brand.desires || { internal: [], external: [] },
+        desires: (brand.desires as { internal: string[]; external: string[] }) || { internal: [], external: [] },
         fears: brand.fears || [],
-        archetype: brand.archetype || { name: '', description: '', example: '' },
+        archetype: (brand.archetype as { name: string; description: string; example: string }) || { name: '', description: '', example: '' },
         brandPromise: brand.brand_promise,
         coreValues: brand.core_values || [],
-        slogans: brand.slogans || { main: '', secondary: [] }
+        slogans: (brand.slogans as { main: string; secondary: string[] }) || { main: '', secondary: [] }
       }));
 
       setBrands(transformedBrands);
