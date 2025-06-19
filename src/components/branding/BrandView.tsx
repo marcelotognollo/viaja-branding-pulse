@@ -67,7 +67,7 @@ export function BrandView({
       </div>
 
       <Tabs defaultValue="branding" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 sirius-card mb-8 py-0">
+        <TabsList className="grid w-full grid-cols-3 sirius-card mb-8 py-[2px]">
           <TabsTrigger value="branding" className="text-slate-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white py-[6px]">
             <Palette className="w-4 h-4 mr-2" />
             Branding
