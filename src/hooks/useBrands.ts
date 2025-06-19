@@ -1,23 +1,16 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 import { Brand } from '@/types/brand';
 import { toast } from 'sonner';
 
 export function useBrands() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
 
   useEffect(() => {
-    if (user) {
-      fetchBrands();
-    } else {
-      setBrands([]);
-      setLoading(false);
-    }
-  }, [user]);
+    fetchBrands();
+  }, []);
 
   const fetchBrands = async () => {
     try {
@@ -69,13 +62,11 @@ export function useBrands() {
   };
 
   const createBrand = async (brandData: Partial<Brand>) => {
-    if (!user) return;
-
     try {
       const { data, error } = await supabase
         .from('brands')
         .insert([{
-          user_id: user.id,
+          // Removendo user_id temporariamente
           name: brandData.name || '',
           description: brandData.description || '',
           personality: brandData.personality || [],
@@ -115,8 +106,6 @@ export function useBrands() {
   };
 
   const updateBrand = async (brandId: string, brandData: Partial<Brand>) => {
-    if (!user) return;
-
     try {
       const { error } = await supabase
         .from('brands')
@@ -159,8 +148,6 @@ export function useBrands() {
   };
 
   const deleteBrand = async (brandId: string) => {
-    if (!user) return;
-
     try {
       const { error } = await supabase
         .from('brands')

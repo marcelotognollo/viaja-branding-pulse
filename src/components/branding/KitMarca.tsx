@@ -1,16 +1,13 @@
-
 import { useState } from "react";
-import { Plus, Edit, Trash2, Star, Crown, LogOut } from "lucide-react";
+import { Plus, Edit, Trash2, Star, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BrandForm } from "./BrandForm";
 import { BrandView } from "./BrandView";
 import { Brand } from "@/types/brand";
-import { useAuth } from "@/contexts/AuthContext";
 import { useBrands } from "@/hooks/useBrands";
 
 export function KitMarca() {
-  const { user, signOut } = useAuth();
   const { brands, loading, createBrand, updateBrand, deleteBrand } = useBrands();
   const [isCreating, setIsCreating] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
@@ -32,10 +29,6 @@ export function KitMarca() {
     if (confirm('Tem certeza que deseja deletar esta marca?')) {
       await deleteBrand(brandId);
     }
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
   };
 
   if (viewingBrand) {
@@ -87,11 +80,6 @@ export function KitMarca() {
           <p className="text-cyan-300 mt-3 text-lg">
             Gerencie a identidade cósmica das suas marcas com elegância estelar
           </p>
-          {user && (
-            <p className="text-slate-400 mt-2">
-              Bem-vindo, {user.user_metadata?.full_name || user.email}
-            </p>
-          )}
         </div>
         <div className="flex gap-4">
           <Button 
@@ -100,14 +88,6 @@ export function KitMarca() {
           >
             <Plus className="w-5 h-5 mr-3" />
             Nova Marca
-          </Button>
-          <Button 
-            onClick={handleSignOut}
-            variant="outline"
-            className="border-red-400/40 text-red-300 hover:bg-red-500/20 hover:text-white px-6 py-4"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
           </Button>
         </div>
       </div>
