@@ -1,56 +1,65 @@
 
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/sidebar/AppSidebar";
-import { Dashboard } from "@/components/dashboard/Dashboard";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { KitMarca } from "@/components/branding/KitMarca";
-import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Star, LogIn } from "lucide-react";
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
-  const renderContent = () => {
-    switch (activeSection) {
-      case "dashboard":
-        return <Dashboard />;
-      case "kit-marca":
-        return <KitMarca />;
-      case "orcamentos":
-        return <div className="p-6"><h2 className="text-2xl font-bold text-white mb-4">Orçamentos</h2><p className="text-blue-200">Gestão de orçamentos em desenvolvimento...</p></div>;
-      case "roteiros":
-        return <div className="p-6"><h2 className="text-2xl font-bold text-white mb-4">Roteiros</h2><p className="text-blue-200">Gestão de roteiros em desenvolvimento...</p></div>;
-      case "contratos":
-        return <div className="p-6"><h2 className="text-2xl font-bold text-white mb-4">Contratos</h2><p className="text-blue-200">Gestão de contratos em desenvolvimento...</p></div>;
-      case "crm":
-        return <div className="p-6"><h2 className="text-2xl font-bold text-white mb-4">CRM - Clientes</h2><p className="text-blue-200">Sistema de CRM em desenvolvimento...</p></div>;
-      case "financeiro":
-        return <div className="p-6"><h2 className="text-2xl font-bold text-white mb-4">Financeiro</h2><p className="text-blue-200">Módulo financeiro em desenvolvimento...</p></div>;
-      case "marketing":
-        return <div className="p-6"><h2 className="text-2xl font-bold text-white mb-4">Marketing</h2><p className="text-blue-200">Ferramentas de marketing em desenvolvimento...</p></div>;
-      case "tarefas":
-        return <div className="p-6"><h2 className="text-2xl font-bold text-white mb-4">Tarefas</h2><p className="text-blue-200">Gestão de tarefas em desenvolvimento...</p></div>;
-      case "editorial":
-        return <div className="p-6"><h2 className="text-2xl font-bold text-white mb-4">Editorial de Conteúdo</h2><p className="text-blue-200">Gestão de conteúdo em desenvolvimento...</p></div>;
-      default:
-        return <Dashboard />;
+  useEffect(() => {
+    if (!loading && !user) {
+      // If not loading and no user, we're not authenticated
+      // Show landing page instead of redirecting immediately
     }
-  };
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h3 className="text-xl text-slate-400">Carregando...</h3>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="text-center max-w-2xl mx-auto">
+          <Star className="w-20 h-20 text-cyan-400 mx-auto mb-8 icon-glow" fill="currentColor" />
+          <h1 className="text-5xl font-bold text-white mb-6 glow">
+            Sirius
+          </h1>
+          <p className="text-xl text-cyan-300 mb-8 leading-relaxed">
+            Sua plataforma de branding cósmica. Crie, gerencie e organize a identidade das suas marcas com elegância estelar.
+          </p>
+          <div className="space-y-4">
+            <Button 
+              onClick={() => navigate('/auth')}
+              className="sirius-button px-8 py-4 text-lg"
+            >
+              <LogIn className="w-5 h-5 mr-3" />
+              Começar Agora
+            </Button>
+            <p className="text-slate-400 text-sm">
+              Crie sua conta gratuita e comece a transformar suas marcas
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="travel-agency-theme">
-      <div className="min-h-screen">
-        <SidebarProvider>
-          <div className="min-h-screen flex w-full">
-            <AppSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
-            <main className="flex-1 overflow-auto">
-              <div className="min-h-screen backdrop-blur-sm bg-black/10">
-                {renderContent()}
-              </div>
-            </main>
-          </div>
-        </SidebarProvider>
-      </div>
-    </ThemeProvider>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <KitMarca />
+    </div>
   );
 };
 

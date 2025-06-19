@@ -1,110 +1,41 @@
 
 import { useState } from "react";
-import { Plus, Edit, Trash2, Star, Crown } from "lucide-react";
+import { Plus, Edit, Trash2, Star, Crown, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BrandForm } from "./BrandForm";
 import { BrandView } from "./BrandView";
 import { Brand } from "@/types/brand";
-
-const mockBrands: Brand[] = [
-  {
-    id: "1",
-    name: "Cosmos Luxury",
-    description: "Viagens premium com toque cósmico e elegância estelar",
-    createdAt: "2024-01-15",
-    personality: ["Sofisticada", "Misteriosa", "Elegante", "Cósmica"],
-    toneOfVoice: "Refinado e inspirador",
-    targetAudience: "Executivos 35-55 anos, interessados em experiências únicas e luxuosas",
-    primaryColors: ["#0b1c3b", "#102840"],
-    secondaryColors: ["#66ccff", "#a96dff"],
-    typography: {
-      title: "Playfair Display",
-      body: "Inter",
-      accent: "Montserrat"
-    },
-    atmosphere: {
-      scents: ["Âmbar", "Cedro"],
-      environments: ["Observatório", "Hotel 5 estrelas"],
-      playlists: ["Ambient Cosmic", "Neo-Classical"],
-      references: ["Tesla", "SpaceX", "Rolls Royce"]
-    },
-    logos: {
-      primary: "",
-      horizontal: "",
-      favicon: ""
-    },
-    brandStory: "Nascida da observação das estrelas, Cosmos Luxury combina o fascínio pelo universo com experiências terrestres extraordinárias.",
-    timeline: [
-      { year: "2020", event: "Fundação da empresa" },
-      { year: "2022", event: "Primeira viagem espacial comercial" }
-    ],
-    publicObjections: ["Muito caro", "Só para ricos"],
-    desires: {
-      internal: ["Sentir-se especial", "Pertencer a um grupo exclusivo"],
-      external: ["Experiências únicas", "Status social"]
-    },
-    fears: ["Perder dinheiro", "Não valer a pena"],
-    archetype: {
-      name: "Mago",
-      description: "Transforma sonhos em realidade através de experiências extraordinárias",
-      example: "Comunicação que promete transformação através da viagem"
-    },
-    brandPromise: "Transformamos seus sonhos cósmicos em experiências reais que tocam a alma",
-    coreValues: ["Excelência", "Exclusividade", "Transformação"],
-    slogans: {
-      main: "Toque as estrelas, sinta o infinito",
-      secondary: ["Além do comum", "Experiências estelares"]
-    }
-  }
-];
+import { useAuth } from "@/contexts/AuthContext";
+import { useBrands } from "@/hooks/useBrands";
 
 export function KitMarca() {
-  const [brands, setBrands] = useState<Brand[]>(mockBrands);
+  const { user, signOut } = useAuth();
+  const { brands, loading, createBrand, updateBrand, deleteBrand } = useBrands();
   const [isCreating, setIsCreating] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [viewingBrand, setViewingBrand] = useState<Brand | null>(null);
 
-  const handleCreateBrand = (brandData: Partial<Brand>) => {
-    const newBrand: Brand = {
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString().split('T')[0],
-      name: "",
-      description: "",
-      personality: [],
-      toneOfVoice: "",
-      targetAudience: "",
-      primaryColors: ["#0b1c3b"],
-      secondaryColors: ["#66ccff"],
-      typography: { title: "", body: "", accent: "" },
-      atmosphere: { scents: [], environments: [], playlists: [], references: [] },
-      logos: { primary: "", horizontal: "", favicon: "" },
-      timeline: [],
-      publicObjections: [],
-      desires: { internal: [], external: [] },
-      fears: [],
-      archetype: { name: "", description: "", example: "" },
-      coreValues: [],
-      slogans: { main: "", secondary: [] },
-      ...brandData as Brand
-    };
-    setBrands([...brands, newBrand]);
+  const handleCreateBrand = async (brandData: Partial<Brand>) => {
+    await createBrand(brandData);
     setIsCreating(false);
   };
 
-  const handleEditBrand = (brandData: Partial<Brand>) => {
+  const handleEditBrand = async (brandData: Partial<Brand>) => {
     if (editingBrand) {
-      setBrands(brands.map(brand => 
-        brand.id === editingBrand.id 
-          ? { ...brand, ...brandData }
-          : brand
-      ));
+      await updateBrand(editingBrand.id, brandData);
       setEditingBrand(null);
     }
   };
 
-  const handleDeleteBrand = (brandId: string) => {
-    setBrands(brands.filter(brand => brand.id !== brandId));
+  const handleDeleteBrand = async (brandId: string) => {
+    if (confirm('Tem certeza que deseja deletar esta marca?')) {
+      await deleteBrand(brandId);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   if (viewingBrand) {
@@ -133,6 +64,17 @@ export function KitMarca() {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="text-center py-16">
+          <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h3 className="text-xl text-slate-400">Carregando suas marcas...</h3>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
       {/* Header */}
@@ -145,14 +87,29 @@ export function KitMarca() {
           <p className="text-cyan-300 mt-3 text-lg">
             Gerencie a identidade cósmica das suas marcas com elegância estelar
           </p>
+          {user && (
+            <p className="text-slate-400 mt-2">
+              Bem-vindo, {user.user_metadata?.full_name || user.email}
+            </p>
+          )}
         </div>
-        <Button 
-          onClick={() => setIsCreating(true)}
-          className="sirius-button px-8 py-4 text-lg"
-        >
-          <Plus className="w-5 h-5 mr-3" />
-          Nova Marca
-        </Button>
+        <div className="flex gap-4">
+          <Button 
+            onClick={() => setIsCreating(true)}
+            className="sirius-button px-8 py-4 text-lg"
+          >
+            <Plus className="w-5 h-5 mr-3" />
+            Nova Marca
+          </Button>
+          <Button 
+            onClick={handleSignOut}
+            variant="outline"
+            className="border-red-400/40 text-red-300 hover:bg-red-500/20 hover:text-white px-6 py-4"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sair
+          </Button>
+        </div>
       </div>
 
       {/* Brands Grid */}
